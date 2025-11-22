@@ -1,0 +1,34 @@
+version: "3.9"
+
+services:
+  api:
+    build: .                # 이 폴더에 있는 Dockerfile로 빌드하기
+    container_name: gravity_api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    env_file:
+      - .env
+    volumes:
+      - .:/app              # 현재 폴더 전체를 컨테이너 /app에 마운트
+
+  db:
+    image: mysql:8.0
+    container_name: gravity_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASS}
+      MYSQL_DATABASE: ${DB_NAME}
+    ports:
+      - "3308:3306"
+    command:
+      - "--default-authentication-plugin=mysql_native_password"
+      - "--character-set-server=utf8mb4"
+      - "--collation-server=utf8mb4_unicode_ci"
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  db_data:
